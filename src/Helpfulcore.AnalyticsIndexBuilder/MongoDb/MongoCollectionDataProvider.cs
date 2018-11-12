@@ -16,6 +16,7 @@
     using Collections;
     using Data;
     using Logging;
+    using MongoDB.Driver;
 
     public class MongoCollectionDataProvider : CollectionDataProvider
     {
@@ -38,7 +39,7 @@
             this.Logger.Info($"Retrieveing all contact id's from '{this.AnalyticsMongoConnectionString}' collection database.", this);
 
             var driver = MongoDbDriver.FromConnectionString(this.AnalyticsMongoConnectionString);
-            return driver.Contacts.FindAllAs<ContactIdentifiersData>();
+            return driver.Contacts.FindAllAs<ContactIdentifiersData>().SetFlags(QueryFlags.NoCursorTimeout).SetMaxTime(new TimeSpan(0, 0, 30, 0));
         }
 
         public override IEnumerable<Guid> GetAllContactIdsToReindex()
@@ -55,7 +56,7 @@
             return this.SafeExecution($"Retrieveing all visit data from '{this.AnalyticsMongoConnectionString}' collection database.", () =>
             {
                 var driver = MongoDbDriver.FromConnectionString(this.AnalyticsMongoConnectionString);
-                return driver.Interactions.FindAllAs<VisitData>();
+                return driver.Interactions.FindAllAs<VisitData>().SetFlags(QueryFlags.NoCursorTimeout).SetMaxTime(new TimeSpan(0, 0, 30, 0));
             });
         }
 
